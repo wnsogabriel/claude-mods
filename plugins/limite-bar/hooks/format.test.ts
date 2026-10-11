@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 
 import {
   alertsToFire, alertText, bar, duration, projection, pruneFired,
-  resetIn, segments, textoTarefas, tokens, tokensGastos, tone,
+  grupos, resetIn, segments, textoTarefas, tokens, tokensGastos, tone,
 } from './format'
 
 const MIN = 60_000
@@ -162,5 +162,27 @@ describe('textoTarefas', () => {
     expect(textoTarefas({ feitos: 0, total: 0, pendencias: 1 })).toBe('📋 1 pend.')
     expect(textoTarefas({ feitos: 1, total: 4, pendencias: 0 })).toBe('📋 1/4')
     expect(textoTarefas({ feitos: 0, total: 0, pendencias: 0 })).toBeNull()
+  })
+})
+
+describe('grupos', () => {
+  const view = {
+    limits: [
+      { kind: 'five_hour', percentUsed: 60, resetsAt: iso(NOW + 3 * HOUR) },
+      { kind: 'seven_day', percentUsed: 22, resetsAt: iso(NOW + 48 * HOUR) },
+    ],
+    contextPercent: 64,
+    sessionTokens: 182_400,
+  }
+  const textos = (g: { text: string }[][]) => g.map(s => s.map(x => x.text).join(''))
+  test('um bloco por informação, sem separadores (a quebra é entre blocos)', () => {
+    const g = textos(grupos(view, NOW, false))
+    expect(g).toHaveLength(4)
+    expect(g[0]).toBe('5h ██████░░░░ 60% · reseta 3h00 · ritmo: acaba em ~1h20')
+    expect(g[3]).toBe('ctx 64%')
+    expect(g.join('')).not.toContain('│')
+  })
+  test('compacto omite sessão', () => {
+    expect(textos(grupos(view, NOW, true))).toEqual(['5h 60% 3h00 ~1h20', 'sem 22%', 'ctx 64%'])
   })
 })

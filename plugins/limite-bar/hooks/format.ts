@@ -127,19 +127,26 @@ function sevenDay(l: Limit | undefined, compact: boolean): Segment[] {
   return out
 }
 
-export function segments(view: View, now: number, compact: boolean): Segment[] {
+/**
+ * A faixa em blocos indivisíveis (5h, semana, sessão, contexto): quem desenha
+ * quebra a linha entre blocos, nunca dentro de um — assim nada vira reticências.
+ */
+export function grupos(view: View, now: number, compact: boolean): Segment[][] {
   const find = (kind: string) => view.limits.find(l => l.kind === kind)
   const ctx: Segment = view.contextPercent === null
     ? { text: 'ctx —', dim: true }
     : { text: `ctx ${pct(view.contextPercent)}`, color: tone(view.contextPercent) }
   return [
-    ...fiveHour(find('five_hour'), now, compact),
-    SEP,
-    ...sevenDay(find('seven_day'), compact),
-    ...(compact ? [] : [SEP, { text: `sessão ${tokens(view.sessionTokens)} tok` }]),
-    SEP,
-    ctx,
+    fiveHour(find('five_hour'), now, compact),
+    sevenDay(find('seven_day'), compact),
+    ...(compact ? [] : [[{ text: `sessão ${tokens(view.sessionTokens)} tok` }]]),
+    [ctx],
   ]
+}
+
+/** A faixa em uma linha só, com separadores (texto corrido; útil em testes e logs). */
+export function segments(view: View, now: number, compact: boolean): Segment[] {
+  return grupos(view, now, compact).flatMap((g, i) => (i === 0 ? g : [SEP, ...g]))
 }
 
 export type Uso = {

@@ -58,3 +58,25 @@ test('faixa compacta abaixo de 90 colunas', async ($, on) => {
     await ui.unmount()
   }
 })
+
+test('modo completo desenha blocos inteiros, sem reticências', async ($, on) => {
+  mock.clock(on, { now: NOW })
+  mock.store(on)
+  on('ui.toast', () => ({ value: undefined }))
+  on('session.measure', ($, e) => ({ changed: e.changed }))
+  await $.session.measure(measure(40))
+
+  const ui = await $.ui.mount({
+    plugin: 'limite-bar',
+    surface: 'desktop',
+    component: 'AbovePrompt',
+    props: {
+      hasSurvey: false, isWorking: false, maxRows: 5, bodyColumns: 140,
+      scroll: { offset: 0, bodyRows: 4 }, view: {},
+    },
+  })
+  expect(await ui.find({ type: 'Text', text: '5h ████░░░░░░ 40%' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: ' · reseta 1h00' })).toBeDefined()
+  expect(await ui.findAll({ type: 'Text', text: /│/ })).toHaveLength(0)
+  await ui.unmount()
+})

@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import type { Limit } from '../types'
-import { alertsToFire, alertText, KNOWN_KINDS, pruneFired, segments, textoTarefas, tokensGastos } from './format'
+import { alertsToFire, alertText, grupos, KNOWN_KINDS, pruneFired, textoTarefas, tokensGastos } from './format'
 
 const limits = atom({ plugin: 'limite-bar', key: 'limits' } as const, [] as Limit[])
 const contextPercent = atom({ plugin: 'limite-bar', key: 'contextPercent' } as const, null as number | null)
@@ -70,19 +70,25 @@ export const register: Register = on => {
       sessionTokens: await read($, sessionTokens),
     }
     const t = (await read($, now)) || (await $.clock.now())
-    const segs = segments(view, t, e.props.bodyColumns < COMPACT_BELOW)
+    const blocos = grupos(view, t, e.props.bodyColumns < COMPACT_BELOW)
     const resumo = await $.state.get(tarefasResumo).then(r => r.value, () => undefined)
     const tarefas = resumo == null ? null : textoTarefas(resumo)
+    // Cada bloco é indivisível (flexShrink 0); sem espaço, o bloco inteiro desce de linha.
     return (
-      <Box>
-        {segs.map((s, i) => (
-          <Text key={String(i)} color={s.color} dimColor={s.dim} wrap="truncate">
-            {s.text}
-          </Text>
+      <Box flexDirection="row" flexWrap="wrap" columnGap={3}>
+        {blocos.map((bloco, b) => (
+          <Box key={`b${b}`} flexDirection="row" flexShrink={0}>
+            {bloco.map((s, i) => (
+              <Text key={`b${b}s${i}`} color={s.color} dimColor={s.dim} wrap="end">
+                {s.text}
+              </Text>
+            ))}
+          </Box>
         ))}
-        {tarefas === null ? null : <Text dimColor> │ </Text>}
         {tarefas === null ? null : (
-          <Button key="tarefas" plain label={tarefas} onPress={() => void $.command.run({ command: 'tarefas' })} />
+          <Box key="tarefas-box" flexShrink={0}>
+            <Button key="tarefas" plain label={tarefas} onPress={() => void $.command.run({ command: 'tarefas' })} />
+          </Box>
         )}
       </Box>
     )
