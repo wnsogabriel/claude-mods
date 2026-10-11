@@ -26,7 +26,7 @@ jobs:
         mod: [limite-bar, painel-tarefas]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       # Versão fixa: a API de mods é early access e muda entre releases.
