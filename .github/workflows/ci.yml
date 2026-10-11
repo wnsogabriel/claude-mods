@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  mods:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        mod: [limite-bar, painel-tarefas]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Versão fixa: a API de mods é early access e muda entre releases.
+      - run: npm install -g @anthropic-ai/claude-code@2.1.296
+      - name: Validar manifesto e módulo
+        run: claude plugin validate plugins/${{ matrix.mod }}
+      - name: Testes
+        run: claude plugin test plugins/${{ matrix.mod }}

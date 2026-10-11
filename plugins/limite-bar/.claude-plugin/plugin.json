@@ -1,0 +1,10 @@
+{
+  "name": "limite-bar",
+  "version": "0.1.0",
+  "description": "Faixa acima do prompt com limites de 5h e semanal, reset, ritmo, tokens e contexto.",
+  "author": {
+    "name": "wnsogabriel"
+  },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "wnsogabriel-mods",
+  "owner": {
+    "name": "wnsogabriel"
+  },
+  "description": "Mods para o Claude Code: faixa de limites de uso e painel de tarefas/pendências.",
+  "plugins": [
+    {
+      "name": "limite-bar",
+      "source": "./plugins/limite-bar",
+      "description": "Faixa acima do prompt com limites de 5h e semanal, reset, ritmo, tokens e contexto."
+    },
+    {
+      "name": "painel-tarefas",
+      "source": "./plugins/painel-tarefas",
+      "description": "Painel lateral com as tarefas da sessão (Agora) e pendências persistentes por projeto."
+    }
+  ]
+}

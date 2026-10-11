@@ -1,0 +1,10 @@
+{
+  "name": "painel-tarefas",
+  "version": "0.1.0",
+  "description": "Painel lateral com as tarefas da sessão (Agora) e pendências persistentes por projeto.",
+  "author": {
+    "name": "wnsogabriel"
+  },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

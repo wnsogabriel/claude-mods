@@ -1,0 +1,15 @@
+# Tipos que o Claude Code gera ao carregar um mod (regenerados a cada versão)
+plugins/*/.claude-plugin/types/
+
+# Ambiente e segredos (este repo não usa nenhum, mas nunca devem entrar)
+.env
+.env.*
+*.pem
+*.key
+
+# Ferramentas locais
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
